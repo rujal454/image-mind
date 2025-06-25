@@ -1,5 +1,4 @@
-*.pkl
-*.bat
+
 *.txt
 __pycache__/
 .env
