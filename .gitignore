@@ -1,0 +1,6 @@
+*.pkl
+*.bat
+*.txt
+__pycache__/
+.env
+*.DS_Store

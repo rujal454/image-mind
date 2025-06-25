@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageMind</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+        .container { 
+            width: 85%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .header { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 20px; 
+        }
+        .logo { 
+            width: 50px; 
+            height: auto; 
+            margin-right: 10px;
+        }
+        h1 { 
+            font-size: 2.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        h2 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #666;
+        }
+        .fa-gear {
+            color: #666;
+        }
+        .form-group {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+        }
+        input[type="text"], input[type="file"], input[type="number"], input[type="button"], button {
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        input[type="button"], button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        input[type="button"]:hover, button:hover {
+            background: #34495e;
+            transform: translateY(-2px);
+        }
+        #video, #canvas, #capturedImage { 
+            max-width: 100%; 
+        }
+        #response { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+        }
+        .result-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        .result-item:hover {
+            transform: translateY(-5px);
+        }
+        .result-item img { 
+            margin-bottom: 10px; 
+            max-width: 200px; 
+        }
+        .settings-button {
+            background: transparent;
+            border: 2px solid #e1e4e8;
+            color: #2c3e50;
+        }
+        .settings-button:hover {
+            background: #f8f9fa;
+        }
+        .left-logo {
+            width: auto; /* Adjust width as needed */
+            height: 50px; /* Adjust height as needed */
+            margin-right: 1000px; /* Add margin for spacing */
+        }
+        .right-logo {
+            width: auto; /* Adjust width as needed */
+            height: 50px; /* Adjust height as needed */
+        }
+        .footer {
+            background: linear-gradient(to right, #2c3e50, #3498db);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        .footer p {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .footer a {
+            color: #fff;
+        }
+        
+        .footer a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        .footer .copyright {
+            font-size: 14px;
+            color: #666;
+        }
+        .tab {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+        }
+        .tablinks {
+            background: transparent;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            color: #666;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .tablinks:hover {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            transform: translateY(-2px);
+        }
+        .tablinks.active {
+            background-color: #2c3e50;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+        }
+        
+        .search-options {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .management-option {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .management-option h3 {
+            color: #2c3e50;
+            margin-bottom: 0.8rem;
+        }
+        
+        .response-container {
+            min-height: 100px;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 0.5rem;
+        }
+
+        .visualization-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .visualization-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        .visualization-card canvas {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 300px;
+        }
+
+        .evaluate-button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .evaluate-button:hover {
+            background: #34495e;
+            transform: translateY(-2px);
+        }
+
+        .evaluation-progress {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: #e1e4e8;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            display: block;
+            width: 0%;
+            height: 100%;
+            background: #2c3e50;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="./static/ImageMind.svg" alt="ImageMind Logo" class="left-logo">
+        <h1 style="margin-left: 0;">ImageMind</h1> 
+        <div class="tab">
+            <button class="tablinks" onclick="openTab('Search')"><b>Search</b></button>
+            <button class="tablinks" onclick="openTab('Train')"><b>Train Model</b></button>
+            <button class="settings-button" onclick="openSettings()"><i class="fa fa-gear"></i></button>
+        </div>
+
+        <!-- Search Tab -->
+        <div id="Search" class="tabcontent">
+            <div class="form-group">
+                <h2>Search Image</h2>
+                <ul>
+                    <li><p>To search for similar images, upload an image along with how many results (K) and minimum similarity (Threshold) you want.</p></li>
+                </ul>
+                
+                <!-- Search Options -->
+                <div class="search-options">
+                    <div class="upload-option">
+                        <label for="fileSearchImage">Upload Image</label>
+                        <input type="file" id="fileSearchImage" name="image" accept="image/*">
+                        <input type="button" value="Search with Selected Image" onclick="searchImage('file')">
+                    </div>
+
+                    <div class="camera-option">
+                        <label for="cameraCapture">Capture Image</label>
+                        <button id="cameraCapture">Open Camera</button>
+                        <video id="video" style="display:none;"></video>
+                        <canvas id="canvas" style="display:none;"></canvas>
+                        <img id="capturedImage" style="display:none;">
+                        <input type="button" value="Search with Captured Image" onclick="searchImage('camera')" id="searchCaptured" style="display:none;">
+                    </div>
+
+                    <div class="search-parameters">
+                        <label for="k">Number of Required Photos</label>
+                        <input type="number" id="Number_Of_Images_Req" name="k" value="5">
+                        
+                        <label for="threshold">Similarity Percentage (0-100):</label>
+                        <input type="text" id="Similarity_Percentage" name="threshold" value="80">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div class="form-group">
+                <h2>Results</h2>
+                <div id="searchResponse" class="response-container"></div>
+            </div>
+        </div>
+
+        <!-- Train Tab -->
+        <div id="Train" class="tabcontent">
+            <!-- Training Section -->
+            <div class="form-group">
+                <h2>Train Model</h2>
+                <ul>
+                    <li><p>Train the model with your image dataset to improve recognition accuracy.</p></li>
+                </ul>
+                <label for="trainFolder">Image Folder Path</label>
+                <input type="text" id="trainFolder" name="folder_path">
+                <input type="button" value="Train Model" onclick="trainModel()">
+            </div>
+
+            <!-- Model Management Section -->
+            <div class="form-group">
+                <h2>Model Management</h2>
+                
+                <!-- Rebuild Index -->
+                <div class="management-option">
+                    <h3>Rebuild Index</h3>
+                    <label for="rebuildFolder">New Folder Path</label>
+                    <input type="text" id="rebuildFolder" name="folder_path">
+                    <input type="button" value="Rebuild Index" onclick="rebuildIndex()">
+                </div>
+
+                <!-- Insert Image -->
+                <div class="management-option">
+                    <h3>Insert Single Image</h3>
+                    <label for="insertImage">Select Image</label>
+                    <input type="file" id="insertImage" name="image">
+                    <input type="button" value="Insert Image" onclick="insertImage()">
+                </div>
+
+                <!-- Insert Folder -->
+                <div class="management-option">
+                    <h3>Insert Folder</h3>
+                    <label for="insertFolder">Folder Path</label>
+                    <input type="text" id="insertFolder" name="folder_path">
+                    <input type="button" value="Insert Folder" onclick="insertFolder()">
+                </div>
+
+                <!-- Delete Images -->
+                <div class="management-option">
+                    <h3>Delete Images</h3>
+                    <label for="deleteImages">Select Images to Delete</label>
+                    <input type="file" id="deleteImages" name="images" multiple>
+                    <input type="button" value="Delete Images" onclick="deleteImages()">
+                </div>
+            </div>
+
+            <!-- Model Evaluation -->
+            
+
+            <!-- Training Response -->
+            <div class="form-group">
+                <h2>Operation Results</h2>
+                <div id="trainResponse" class="response-container"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="copyright">©️ 2024 ImageMind - Intelligent Image Analysis Platform Created By Dhruv Dakhara</p>
+        </div>
+    </div>  
+
+    <script>
+        function openTab(tabName) {
+            // Hide all tabcontent elements
+            const tabcontents = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontents.length; i++) {
+                tabcontents[i].style.display = "none";
+            }
+
+            // Remove active class from all tablinks
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+
+            // Show the selected tab and add active class to the button
+            document.getElementById(tabName).style.display = "block";
+            event.currentTarget.classList.add("active");
+
+            // Clear responses when switching tabs
+            document.getElementById("searchResponse").innerHTML = "";
+            document.getElementById("trainResponse").innerHTML = "";
+        }
+
+        let videoStream;
+        function toggleApiDoc(element) {
+            const content = element.querySelector('.api-doc-content');
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function openSettings() {
+            window.open("/setup", "_blank");
+        }
+
+        document.querySelector(".settings-button").addEventListener("click", openSettings);
+
+        // Modify the trainModel function
+        async function trainModel() {
+            const folderPath = document.getElementById('trainFolder').value;
+            const responseElement = document.getElementById('trainResponse');
+            
+            try {
+                const response = await fetch('/train', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ folder_path: folderPath }),
+                });
+                const result = await response.json();
+                responseElement.textContent = JSON.stringify(result, null, 4);
+                
+                // Automatically save the configuration after training
+                
+            } catch (error) {
+                responseElement.textContent = "Error: " + error;
+            }
+        } 
+
+        // Modify the rebuildIndex function
+        async function rebuildIndex() {
+            const folderPath = document.getElementById('rebuildFolder').value;
+            const responseElement = document.getElementById('trainResponse');
+            
+            try {
+                const response = await fetch('/rebuild', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ folder_path: folderPath }),
+                });
+                const result = await response.json();
+                responseElement.textContent = JSON.stringify(result, null, 4);
+                
+                // Automatically save the configuration after rebuilding
+                
+            } catch (error) {
+                responseElement.textContent = "Error: " + error;
+            }
+        }
+
+        async function insertFolder() {
+            const folderPath = document.getElementById('insertFolder').value;
+            const responseElement = document.getElementById('trainResponse');
+    
+            try {
+                const response = await fetch('/insert_folder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ folder_path: folderPath }),
+                });
+                const result = await response.json();
+                responseElement.textContent = JSON.stringify(result, null, 4);
+            } catch (error) {
+                responseElement.textContent = "Error: " + error;
+            }
+        }
+        
+        async function insertImage() {
+            const imageInput = document.getElementById('insertImage');
+            const responseElement = document.getElementById('trainResponse');
+            
+            if (!imageInput.files.length) {
+                responseElement.textContent = "Image file is required";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', imageInput.files[0]);
+
+            try {
+                const response = await fetch('/insert', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                responseElement.textContent = JSON.stringify(result, null, 4);
+            } catch (error) {
+                responseElement.textContent = "Error: " + error;
+            }
+        }
+
+        document.getElementById('cameraCapture').addEventListener('click', async () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const capturedImage = document.getElementById('capturedImage');
+            const searchCapturedButton = document.getElementById('searchCaptured');
+
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = videoStream;
+                video.style.display = 'block';
+                canvas.style.display = 'block';
+                await video.play();
+
+                // Capture image when video plays
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                    capturedImage.src = canvas.toDataURL('image/jpeg');
+                    capturedImage.style.display = 'block';
+                    searchCapturedButton.style.display = 'block';
+                    
+                    // Stop the video stream
+                    videoStream.getTracks().forEach(track => track.stop());
+                    video.style.display = 'none';
+                };
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+            }
+        });
+
+        async function searchImage(type) {
+            const Number_Of_Images_Req = document.getElementById('Number_Of_Images_Req').value;
+            const Similarity_Percentage = document.getElementById('Similarity_Percentage').value;
+           
+            let formData = new FormData();
+            formData.append('Number_Of_Images_Req', Number_Of_Images_Req);
+            formData.append('Similarity_Percentage', Similarity_Percentage);
+
+            if (type === 'file') {
+                const imageInput = document.getElementById('fileSearchImage');
+                if (!imageInput.files.length) {
+                    document.getElementById('searchResponse').textContent = "Image file is required";
+                    return;
+                }
+                formData.append('image', imageInput.files[0]);
+            } else if (type === 'camera') {
+                const canvas = document.getElementById('canvas');
+                canvas.toBlob(async (blob) => {
+                    formData.append('image', blob, 'captured_image.jpg');
+                    await sendSearchRequest(formData);
+                }, 'image/jpeg');
+                return;
+            }
+
+            await sendSearchRequest(formData);
+        }
+
+        async function deleteImages() {
+            const imageInput = document.getElementById('deleteImages');
+            const responseElement = document.getElementById('trainResponse');
+        
+            if (!imageInput.files.length) {
+                responseElement.textContent = "Please select images to delete";
+                return;
+            }
+        
+            const filenames = Array.from(imageInput.files).map(file => file.name);
+        
+            try {
+                const response = await fetch('/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ filenames: filenames }),
+                });
+                const result = await response.json();
+                responseElement.textContent = JSON.stringify(result, null, 4);
+            } catch (error) {
+                responseElement.textContent = "Error: " + error;
+            }
+        }
+
+        async function sendSearchRequest(formData) {
+            const responseElement = document.getElementById('searchResponse');
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.error) {
+                    // Handle error case
+                    responseElement.textContent = "Error: " + result.error;
+                } else {
+                    // Handle success case
+                    displayResults(result.results);
+                }
+            } catch (error) {
+                responseElement.textContent = "Error: " + error;
+            }
+        }
+
+        function displayResults(results) {
+            const responseElement = document.getElementById('searchResponse');
+            responseElement.innerHTML = '';
+
+            if (results.length === 0) {
+                responseElement.textContent = "No results found.";
+                return;
+            }
+
+            results.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'result-item';
+
+                const img = document.createElement('img');
+                img.src = result.url;
+                img.alt = 'Similar image';
+
+                const similarity = document.createElement('p');
+                similarity.textContent = `Similarity: ${(result.similarity * 100).toFixed(2)}%`;
+
+                resultDiv.appendChild(img);
+                resultDiv.appendChild(similarity);
+                responseElement.appendChild(resultDiv);
+            });
+        }
+
+        // Add active state to tabs
+        const tablinks = document.querySelectorAll('.tablinks');
+        tablinks.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tablinks.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Set default active tab
+        document.querySelector('.tablinks').classList.add('active');
+        // Show Search tab by default
+        openTab('Search');
+
+        async function evaluateModel() {
+            const progress = document.querySelector('.evaluation-progress');
+            const progressText = document.querySelector('.progress-text');
+            progress.style.display = 'flex';
+            progressText.textContent = "Evaluating model...";
+
+            try {
+                const response = await fetch('/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                
+                // Update metrics
+                document.getElementById('accuracyValue').textContent = `${(result.accuracy * 100).toFixed(2)}%`;
+                document.getElementById('aucValue').textContent = result.auc.toFixed(3);
+
+                // Create visualizations
+                createROCChart(result.roc_data);
+                createConfusionMatrix(result.confusion_matrix);
+                createFeatureHeatmap(result.feature_importance);
+                createActualVsPredicted(result.actual_vs_predicted);
+
+            } catch (error) {
+                console.error('Error evaluating model:', error);
+                document.getElementById('trainResponse').textContent = "Error evaluating model: " + error.message;
+            } finally {
+                progress.style.display = 'none';
+            }
+        }
+
+        function createROCChart(rocData) {
+            const ctx = document.getElementById('rocCurve').getContext('2d');
+            if (window.rocChart) {
+                window.rocChart.destroy();
+            }
+            window.rocChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: rocData.fpr.map((_, i) => i),
+                    datasets: [{
+                        label: 'ROC Curve',
+                        data: rocData.tpr.map((tpr, i) => ({x: rocData.fpr[i], y: tpr})),
+                        borderColor: '#2c3e50',
+                        backgroundColor: 'rgba(44, 62, 80, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'False Positive Rate'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'True Positive Rate'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createConfusionMatrix(matrix) {
+            const ctx = document.getElementById('confusionMatrix').getContext('2d');
+            if (window.confusionMatrixChart) {
+                window.confusionMatrixChart.destroy();
+            }
+            
+            // Create a heatmap instead of matrix
+            window.confusionMatrixChart = new Chart(ctx, {
+                type: 'heatmap',  // Changed from 'matrix' to 'heatmap'
+                data: {
+                    labels: matrix.map((_, i) => `Class ${i}`),
+                    datasets: [{
+                        data: matrix.flatMap((row, i) => 
+                            row.map((value, j) => ({
+                                x: j,
+                                y: i,
+                                v: value
+                            }))
+                        ),
+                        backgroundColor: (context) => {
+                            const value = context.dataset.data[context.dataIndex].v;
+                            const max = Math.max(...matrix.flat());
+                            const alpha = value / max;
+                            return `rgba(44, 62, 80, ${alpha})`;
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Predicted Class'
+                            },
+                            ticks: {
+                                callback: (value) => `Class ${value}`
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Actual Class'
+                            },
+                            ticks: {
+                                callback: (value) => `Class ${value}`
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: () => '',
+                                label: (context) => {
+                                    const v = context.dataset.data[context.dataIndex].v;
+                                    return `Value: ${v}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createFeatureHeatmap(importance) {
+            const ctx = document.getElementById('featureHeatmap').getContext('2d');
+            if (window.featureHeatmapChart) {
+                window.featureHeatmapChart.destroy();
+            }
+            
+            window.featureHeatmapChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: importance.labels,
+                    datasets: [{
+                        label: 'Feature Importance',
+                        data: importance.values,
+                        backgroundColor: 'rgba(44, 62, 80, 0.7)',
+                        borderColor: 'rgba(44, 62, 80, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Importance Score'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createActualVsPredicted(data) {
+            const ctx = document.getElementById('actualVsPredicted').getContext('2d');
+            if (window.actualVsPredictedChart) {
+                window.actualVsPredictedChart.destroy();
+            }
+            
+            window.actualVsPredictedChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Actual vs Predicted',
+                        data: data.map(([actual, predicted]) => ({
+                            x: actual,
+                            y: predicted
+                        })),
+                        backgroundColor: 'rgba(44, 62, 80, 0.7)',
+                        borderColor: 'rgba(44, 62, 80, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Actual'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Predicted'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>

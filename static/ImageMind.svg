@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Circle -->
+    <circle cx="250" cy="250" r="240" fill="#2c3e50" />
+    
+    <!-- Brain Shape -->
+    <path d="M320 180 
+             C380 180, 400 220, 400 260
+             C400 300, 380 340, 320 340
+             C260 340, 240 300, 240 260
+             C240 220, 260 180, 320 180
+             M180 180
+             C120 180, 100 220, 100 260
+             C100 300, 120 340, 180 340
+             C240 340, 260 300, 260 260
+             C260 220, 240 180, 180 180"
+          fill="#3498db"
+          stroke="#fff"
+          stroke-width="8"/>
+    
+    <!-- Camera Lens -->
+    <circle cx="250" cy="260" r="40" fill="#fff"/>
+    <circle cx="250" cy="260" r="30" fill="#2c3e50"/>
+    <circle cx="235" cy="245" r="8" fill="#fff" opacity="0.8"/>
+    
+    <!-- Text -->
+    <text x="250" y="420" 
+          font-family="Segoe UI, sans-serif" 
+          font-size="48" 
+          font-weight="bold" 
+          text-anchor="middle" 
+          fill="#fff">
+        ImageMind
+    </text>
+</svg>

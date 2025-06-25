@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container { 
+            width: 80%; 
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #00698f;
+        }
+        p {
+            color: #666;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], button { 
+            width: 100%; 
+            padding: 10px; 
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #00698f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #004d7a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Settings Page</h1>
+        <p><b>Note:</b> Change the application port number and network path here. Remember to restart the application after making changes.</p>
+
+        <!-- Form to Change Port Number and Network Path -->
+        <form action="/save_settings" method="post" id="settingsForm">
+            <div class="form-group">
+                <label for="port_number">Port Number:</label>
+                <input type="number" id="port_number" name="port_number" value="{{ current_settings.port_number }}" required>
+            </div>
+            <div class="form-group">
+                <label for="network_path">Image Folder Path:</label>
+                <input type="text" id="network_path" name="network_path" value="{{ current_settings.network_path }}" required>
+            </div>
+            <button type="submit">Save Settings</button>
+        </form>
+
+        <button type="button" onclick="window.close()">Close</button>
+    </div>
+</body>
+</html>
